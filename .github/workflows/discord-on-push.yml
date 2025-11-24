@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - main
+      - master
+      # add more if you want:
+      # - develop
 
 jobs:
   discord_notification:
@@ -13,36 +16,68 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install jq
-        run: sudo apt-get update && sudo apt-get install -y jq
-
-      - name: Send notification to Discord
+      - name: Send Discord embed
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-          REPO_NAME: ${{ github.repository }}
-          BRANCH_NAME: ${{ github.ref_name }}
-          COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
-          COMMIT_AUTHOR: ${{ github.event.head_commit.author.name }}
-          COMMIT_URL: ${{ github.event.head_commit.url }}
         run: |
-          if [ -z "$DISCORD_WEBHOOK_URL" ]; then
-            echo "DISCORD_WEBHOOK_URL is not set. Please add it in the repository secrets."
-            exit 1
-          fi
+          REPO_NAME="${GITHUB_REPOSITORY}"
+          BRANCH_NAME="${GITHUB_REF_NAME}"
+          ACTOR="${{ github.actor }}"
+          COMMIT_MESSAGE="${{ github.event.head_commit.message }}"
+          COMMIT_AUTHOR="${{ github.event.head_commit.author.name }}"
+          # Short SHA (first 7 chars)
+          SHORT_SHA="${GITHUB_SHA::7}"
 
-          # Build content (Discord supports basic markdown and emojis)
-          CONTENT="📢 New push to **${REPO_NAME}** on branch **${BRANCH_NAME}**
+          # Nice human URL to the commit on GitHub
+          COMMIT_URL="https://github.com/${REPO_NAME}/commit/${GITHUB_SHA}"
 
-**Commit:** ${COMMIT_MESSAGE}
-**Author:** ${COMMIT_AUTHOR}
-<${COMMIT_URL}>"
+          # Optional avatar: GitHub user avatar
+          AVATAR_URL="https://github.com/${ACTOR}.png"
 
-          # Build JSON safely with jq
-          JSON=$(jq -n --arg content "$CONTENT" '{content: $content}')
+          # ISO-8601 timestamp for the embed
+          TIMESTAMP="$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
 
-          echo "Payload to send:"
-          echo "$JSON"
+          # Build JSON payload with jq (handles all newlines/escaping)
+          PAYLOAD=$(jq -n \
+            --arg username "GitHub · $REPO_NAME" \
+            --arg avatar_url "$AVATAR_URL" \
+            --arg title "New push to $REPO_NAME" \
+            --arg description "$COMMIT_MESSAGE" \
+            --arg url "$COMMIT_URL" \
+            --arg branch "$BRANCH_NAME" \
+            --arg author "$COMMIT_AUTHOR" \
+            --arg actor "$ACTOR" \
+            --arg sha "$SHORT_SHA" \
+            --arg repo "$REPO_NAME" \
+            --arg timestamp "$TIMESTAMP" \
+            '{
+              username: $username,
+              avatar_url: $avatar_url,
+              embeds: [
+                {
+                  title: $title,
+                  url: $url,
+                  description: $description,
+                  color: 5814783, # teal-style accent bar on the left
+                  timestamp: $timestamp,
+                  author: {
+                    name: $actor,
+                    url: ("https://github.com/" + $actor)
+                  },
+                  fields: [
+                    { name: "Repository", value: $repo, inline: true },
+                    { name: "Branch",    value: $branch, inline: true },
+                    { name: "Commit",    value: ("`" + $sha + "`"), inline: true },
+                    { name: "Committer", value: $author, inline: true }
+                  ],
+                  footer: {
+                    text: "GitHub Actions · push"
+                  }
+                }
+              ]
+            }'
+          )
 
           curl -X POST "$DISCORD_WEBHOOK_URL" \
             -H "Content-Type: application/json" \
-            -d "$JSON"
+            -d "$PAYLOAD"
