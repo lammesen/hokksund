@@ -1,0 +1,23 @@
+# Add labels to PRs based on the paths that are modified in the pull request.
+# See https://github.com/actions/labeler for more information.
+
+# Documentation changes
+documentation:
+  - changed-files:
+    - any-glob-to-any-file: '*.md'
+
+# GitHub configuration and workflow changes
+github:
+  - changed-files:
+    - any-glob-to-any-file: '.github/**/*'
+
+# Workflow changes specifically
+workflows:
+  - changed-files:
+    - any-glob-to-any-file: '.github/workflows/*.yml'
+    - any-glob-to-any-file: '.github/workflows/*.yaml'
+
+# Issue template changes
+issue-templates:
+  - changed-files:
+    - any-glob-to-any-file: '.github/ISSUE_TEMPLATE/*'
