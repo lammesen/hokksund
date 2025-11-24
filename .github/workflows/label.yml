@@ -6,6 +6,8 @@
 # https://github.com/actions/labeler
 
 name: Labeler
+# We use `pull_request_target` instead of `pull_request` because the labeler action requires write permissions to apply labels to PRs.
+# This workflow does NOT check out or execute any code from the PR, so it is safe to use `pull_request_target`.
 on: [pull_request_target]
 
 jobs:
