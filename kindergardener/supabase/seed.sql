@@ -147,26 +147,27 @@ INSERT INTO public.attendance (child_id, check_in_time, check_out_time) VALUES
 -- ============================================
 --
 -- 1. Create the following users in Supabase Auth Dashboard:
+--    (Use your own secure test passwords - do not use weak passwords)
 --
 --    STAFF USERS (role: staff):
---    - staff1@eventyrhagen.no (password: test1234)
---    - staff2@eventyrhagen.no (password: test1234)
---    - staff3@eventyrhagen.no (password: test1234)
+--    - staff1@eventyrhagen.no
+--    - staff2@eventyrhagen.no
+--    - staff3@eventyrhagen.no
 --
 --    ADMIN USER (role: admin):
---    - admin@eventyrhagen.no (password: test1234)
+--    - admin@eventyrhagen.no
 --
 --    PARENT USERS (role: parent):
---    - kari.hansen@example.no (password: test1234) - parent of Emma
---    - lise.johansen@example.no (password: test1234) - parent of Olav
---    - maria.andersen@example.no (password: test1234) - parent of Sofie
---    - silje.larsen@example.no (password: test1234) - parent of Henrik
---    - hilde.pedersen@example.no (password: test1234) - parent of Nora
---    - kristin.nilsen@example.no (password: test1234) - parent of Magnus
---    - tone.eriksen@example.no (password: test1234) - parent of Ingrid
---    - linda.berg@example.no (password: test1234) - parent of Erik
---    - vibeke.kristiansen@example.no (password: test1234) - parent of Astrid
---    - nina.olsen@example.no (password: test1234) - parent of Lars
+--    - kari.hansen@example.no - parent of Emma
+--    - lise.johansen@example.no - parent of Olav
+--    - maria.andersen@example.no - parent of Sofie
+--    - silje.larsen@example.no - parent of Henrik
+--    - hilde.pedersen@example.no - parent of Nora
+--    - kristin.nilsen@example.no - parent of Magnus
+--    - tone.eriksen@example.no - parent of Ingrid
+--    - linda.berg@example.no - parent of Erik
+--    - vibeke.kristiansen@example.no - parent of Astrid
+--    - nina.olsen@example.no - parent of Lars
 --
 -- 2. After creating users, update their profiles:
 --
