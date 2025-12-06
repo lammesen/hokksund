@@ -43,6 +43,9 @@ create table public.attendance (
 );
 alter table public.attendance enable row level security;
 
+-- Index for efficient date-range queries on attendance
+create index attendance_check_in_time_idx on public.attendance (check_in_time);
+
 -- Emergency contacts
 create table public.contacts (
   id uuid primary key default gen_random_uuid(),
@@ -84,9 +87,15 @@ create policy "Staff can view all profiles" on profiles
 create policy "Users can update own profile" on profiles
   for update using (auth.uid() = id)
   with check (auth.uid() = id and role = (select role from profiles where id = auth.uid()));
--- Only admins can update user roles
+-- Admins can update any profile, but cannot escalate roles to admin
+-- (admin role changes must be done via direct database access)
 create policy "Admins can update any profile" on profiles
-  for update using (exists (select 1 from profiles where id = auth.uid() and role = 'admin'));
+  for update using (exists (select 1 from profiles where id = auth.uid() and role = 'admin'))
+  with check (
+    -- Allow update if role is not being changed to 'admin'
+    -- OR if the target user was already an admin (preserve existing admins)
+    role != 'admin' or (select role from profiles where id = profiles.id) = 'admin'
+  );
 
 -- RLS Policies for children
 create policy "Users can view accessible children" on children
