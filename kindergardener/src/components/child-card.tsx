@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useTranslations } from "next-intl"
 import { Card, CardContent } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { StatusBadge } from "@/components/status-badge"
@@ -22,6 +23,7 @@ export function ChildCard({
   attendance,
   onAttendanceUpdate,
 }: ChildCardProps) {
+  const t = useTranslations()
   const [isLoading, setIsLoading] = useState(false)
   const [currentAttendance, setCurrentAttendance] = useState<Attendance | null>(
     attendance
@@ -53,7 +55,7 @@ export function ChildCard({
     setIsLoading(false)
 
     if (error) {
-      toast.error("Failed to check in")
+      toast.error(t("children.checkInError"))
       return
     }
 
@@ -83,7 +85,7 @@ export function ChildCard({
     setIsLoading(false)
 
     if (error) {
-      toast.error("Failed to check out")
+      toast.error(t("children.checkOutError"))
       return
     }
 

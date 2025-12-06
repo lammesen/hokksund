@@ -54,7 +54,11 @@
     "lastSevenDays": "Last 7 days",
     "call": "Call",
     "sendEmail": "Send Email",
-    "primary": "Primary"
+    "primary": "Primary",
+    "checkInError": "Failed to check in",
+    "checkOutError": "Failed to check out",
+    "noContactsFound": "No contacts found",
+    "noAttendanceRecords": "No attendance records"
   },
   "settings": {
     "title": "Settings",
@@ -66,10 +70,12 @@
     "confirmPassword": "Confirm Password",
     "passwordMismatch": "Passwords do not match",
     "passwordTooShort": "Password must be at least 6 characters",
+    "currentPasswordIncorrect": "Current password is incorrect",
     "dangerZone": "Danger Zone",
     "deleteWarning": "This action cannot be undone. All your data will be permanently deleted.",
     "profile": "Profile",
-    "appVersion": "App Version"
+    "appVersion": "App Version",
+    "name": "Name"
   },
   "languages": {
     "no": "Norsk",

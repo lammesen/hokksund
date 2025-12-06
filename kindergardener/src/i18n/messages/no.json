@@ -54,7 +54,11 @@
     "lastSevenDays": "Siste 7 dager",
     "call": "Ring",
     "sendEmail": "Send e-post",
-    "primary": "Primær"
+    "primary": "Primær",
+    "checkInError": "Kunne ikke sjekke inn",
+    "checkOutError": "Kunne ikke sjekke ut",
+    "noContactsFound": "Ingen kontakter funnet",
+    "noAttendanceRecords": "Ingen oppmøteregistreringer"
   },
   "settings": {
     "title": "Innstillinger",
@@ -66,10 +70,12 @@
     "confirmPassword": "Bekreft passord",
     "passwordMismatch": "Passordene stemmer ikke overens",
     "passwordTooShort": "Passordet må være minst 6 tegn",
+    "currentPasswordIncorrect": "Nåværende passord er feil",
     "dangerZone": "Faresone",
     "deleteWarning": "Denne handlingen kan ikke angres. Alle dine data vil bli permanent slettet.",
     "profile": "Profil",
-    "appVersion": "App-versjon"
+    "appVersion": "App-versjon",
+    "name": "Navn"
   },
   "languages": {
     "no": "Norsk",

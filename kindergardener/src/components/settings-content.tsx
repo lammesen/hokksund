@@ -45,6 +45,7 @@ export function SettingsContent({ user }: SettingsContentProps) {
   const [language, setLanguage] = useState(user.language)
   const [isLanguageLoading, setIsLanguageLoading] = useState(false)
 
+  const [currentPassword, setCurrentPassword] = useState("")
   const [newPassword, setNewPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [isPasswordLoading, setIsPasswordLoading] = useState(false)
@@ -88,6 +89,18 @@ export function SettingsContent({ user }: SettingsContentProps) {
     setIsPasswordLoading(true)
     const supabase = createClient()
 
+    // Verify current password by attempting to sign in
+    const { error: signInError } = await supabase.auth.signInWithPassword({
+      email: user.email,
+      password: currentPassword,
+    })
+
+    if (signInError) {
+      setIsPasswordLoading(false)
+      toast.error(t("settings.currentPasswordIncorrect"))
+      return
+    }
+
     const { error } = await supabase.auth.updateUser({
       password: newPassword,
     })
@@ -101,6 +114,7 @@ export function SettingsContent({ user }: SettingsContentProps) {
 
     toast.success(t("common.success"))
     setIsPasswordDialogOpen(false)
+    setCurrentPassword("")
     setNewPassword("")
     setConfirmPassword("")
   }
@@ -129,7 +143,7 @@ export function SettingsContent({ user }: SettingsContentProps) {
             <p className="font-medium">{user.email}</p>
           </div>
           <div className="space-y-2">
-            <Label className="text-muted-foreground">Name</Label>
+            <Label className="text-muted-foreground">{t("settings.name")}</Label>
             <div className="flex items-center gap-2">
               <p className="font-medium">{user.fullName || "-"}</p>
               <Badge variant="secondary">{user.role}</Badge>
@@ -178,6 +192,15 @@ export function SettingsContent({ user }: SettingsContentProps) {
                 <DialogTitle>{t("settings.changePassword")}</DialogTitle>
               </DialogHeader>
               <div className="space-y-4 py-4">
+                <div className="space-y-2">
+                  <Label htmlFor="current-password">{t("settings.currentPassword")}</Label>
+                  <Input
+                    id="current-password"
+                    type="password"
+                    value={currentPassword}
+                    onChange={(e) => setCurrentPassword(e.target.value)}
+                  />
+                </div>
                 <div className="space-y-2">
                   <Label htmlFor="new-password">{t("settings.newPassword")}</Label>
                   <Input
