@@ -45,7 +45,6 @@ export function SettingsContent({ user }: SettingsContentProps) {
   const [language, setLanguage] = useState(user.language)
   const [isLanguageLoading, setIsLanguageLoading] = useState(false)
 
-  const [currentPassword, setCurrentPassword] = useState("")
   const [newPassword, setNewPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [isPasswordLoading, setIsPasswordLoading] = useState(false)
@@ -77,12 +76,12 @@ export function SettingsContent({ user }: SettingsContentProps) {
 
   const handlePasswordChange = async () => {
     if (newPassword !== confirmPassword) {
-      toast.error("Passwords do not match")
+      toast.error(t("settings.passwordMismatch"))
       return
     }
 
     if (newPassword.length < 6) {
-      toast.error("Password must be at least 6 characters")
+      toast.error(t("settings.passwordTooShort"))
       return
     }
 
@@ -102,7 +101,6 @@ export function SettingsContent({ user }: SettingsContentProps) {
 
     toast.success(t("common.success"))
     setIsPasswordDialogOpen(false)
-    setCurrentPassword("")
     setNewPassword("")
     setConfirmPassword("")
   }

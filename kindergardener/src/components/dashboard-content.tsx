@@ -5,7 +5,6 @@ import { useTranslations } from "next-intl"
 import { useChildren } from "@/hooks/use-children"
 import { ChildCard } from "@/components/child-card"
 import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import {
@@ -149,7 +148,7 @@ export function DashboardContent({ isStaff }: DashboardContentProps) {
             {groups.length > 0 && (
               <Select value={groupFilter} onValueChange={setGroupFilter}>
                 <SelectTrigger className="w-[140px]">
-                  <SelectValue placeholder="Group" />
+                  <SelectValue placeholder={t("dashboard.filterGroup")} />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">{t("dashboard.filterAll")}</SelectItem>

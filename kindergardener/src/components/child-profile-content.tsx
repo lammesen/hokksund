@@ -115,7 +115,7 @@ export function ChildProfileContent({
                       <span className="font-medium">{contact.contact_name}</span>
                       {contact.is_primary && (
                         <Badge variant="secondary" className="text-xs">
-                          Primary
+                          {t("children.primary")}
                         </Badge>
                       )}
                     </div>

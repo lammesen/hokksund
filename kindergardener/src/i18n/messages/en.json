@@ -30,6 +30,7 @@
     "pickedUp": "Picked up",
     "search": "Search for children...",
     "filterAll": "All",
+    "filterGroup": "Group",
     "noChildren": "No children found",
     "todaySummary": "{checked} of {total} children checked in",
     "totalChildren": "Total",
@@ -52,7 +53,8 @@
     "dateOfBirth": "Date of Birth",
     "lastSevenDays": "Last 7 days",
     "call": "Call",
-    "sendEmail": "Send Email"
+    "sendEmail": "Send Email",
+    "primary": "Primary"
   },
   "settings": {
     "title": "Settings",
@@ -62,6 +64,8 @@
     "currentPassword": "Current Password",
     "newPassword": "New Password",
     "confirmPassword": "Confirm Password",
+    "passwordMismatch": "Passwords do not match",
+    "passwordTooShort": "Password must be at least 6 characters",
     "dangerZone": "Danger Zone",
     "deleteWarning": "This action cannot be undone. All your data will be permanently deleted.",
     "profile": "Profile",

@@ -80,8 +80,13 @@ create policy "Users can view own profile" on profiles
   for select using (auth.uid() = id);
 create policy "Staff can view all profiles" on profiles
   for select using (public.is_staff_or_admin());
+-- Users can only update their own profile, but cannot change their role
 create policy "Users can update own profile" on profiles
-  for update using (auth.uid() = id);
+  for update using (auth.uid() = id)
+  with check (auth.uid() = id and role = (select role from profiles where id = auth.uid()));
+-- Only admins can update user roles
+create policy "Admins can update any profile" on profiles
+  for update using (exists (select 1 from profiles where id = auth.uid() and role = 'admin'));
 
 -- RLS Policies for children
 create policy "Users can view accessible children" on children

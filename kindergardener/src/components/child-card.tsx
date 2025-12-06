@@ -37,11 +37,15 @@ export function ChildCard({
     setIsLoading(true)
     const supabase = createClient()
 
+    // Get current user for audit trail
+    const { data: { user } } = await supabase.auth.getUser()
+
     const { data, error } = await supabase
       .from("attendance")
       .insert({
         child_id: child.id,
         check_in_time: new Date().toISOString(),
+        check_in_by: user?.id,
       })
       .select()
       .single()
@@ -63,10 +67,14 @@ export function ChildCard({
     setIsLoading(true)
     const supabase = createClient()
 
+    // Get current user for audit trail
+    const { data: { user } } = await supabase.auth.getUser()
+
     const { data, error } = await supabase
       .from("attendance")
       .update({
         check_out_time: new Date().toISOString(),
+        check_out_by: user?.id,
       })
       .eq("id", currentAttendance.id)
       .select()
