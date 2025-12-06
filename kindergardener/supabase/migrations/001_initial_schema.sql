@@ -94,7 +94,7 @@ create policy "Admins can update any profile" on profiles
   with check (
     -- Allow update if role is not being changed to 'admin'
     -- OR if the target user was already an admin (preserve existing admins)
-    role != 'admin' or (select role from profiles where id = profiles.id) = 'admin'
+    role != 'admin' or (select p.role from profiles p where p.id = profiles.id) = 'admin'
   );
 
 -- RLS Policies for children
@@ -140,3 +140,56 @@ $$ language plpgsql security definer;
 create trigger on_auth_user_created
   after insert on auth.users
   for each row execute procedure public.handle_new_user();
+
+-- Trigger: ensure exactly one primary contact per child
+-- When setting a contact as primary, unset other primary contacts for that child
+-- When inserting first contact for a child, auto-set as primary
+create or replace function public.handle_primary_contact()
+returns trigger as $$
+begin
+  -- If this contact is being set as primary, unset others
+  if new.is_primary = true then
+    update public.contacts
+    set is_primary = false
+    where child_id = new.child_id and id != new.id and is_primary = true;
+  end if;
+
+  -- If this is the first contact for the child, make it primary
+  if new.is_primary = false or new.is_primary is null then
+    if not exists (
+      select 1 from public.contacts
+      where child_id = new.child_id and id != new.id
+    ) then
+      new.is_primary := true;
+    end if;
+  end if;
+
+  return new;
+end;
+$$ language plpgsql security definer;
+
+create trigger on_contact_insert_update
+  before insert or update on public.contacts
+  for each row execute procedure public.handle_primary_contact();
+
+-- Trigger: promote another contact to primary when primary contact is deleted
+create or replace function public.handle_primary_contact_delete()
+returns trigger as $$
+begin
+  -- If deleting a primary contact, promote another contact
+  if old.is_primary = true then
+    update public.contacts
+    set is_primary = true
+    where id = (
+      select id from public.contacts
+      where child_id = old.child_id and id != old.id
+      limit 1
+    );
+  end if;
+  return old;
+end;
+$$ language plpgsql security definer;
+
+create trigger on_contact_delete
+  after delete on public.contacts
+  for each row execute procedure public.handle_primary_contact_delete();
