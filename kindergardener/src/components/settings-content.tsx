@@ -76,6 +76,11 @@ export function SettingsContent({ user }: SettingsContentProps) {
   }
 
   const handlePasswordChange = async () => {
+    if (!currentPassword) {
+      toast.error(t("settings.currentPasswordIncorrect"))
+      return
+    }
+
     if (newPassword !== confirmPassword) {
       toast.error(t("settings.passwordMismatch"))
       return
@@ -89,16 +94,28 @@ export function SettingsContent({ user }: SettingsContentProps) {
     setIsPasswordLoading(true)
     const supabase = createClient()
 
-    // Verify current password by attempting to sign in
+    // Verify current password by attempting to sign in with a temporary client
+    // Note: This is a workaround since Supabase doesn't have a dedicated password verification API
+    // The sign-in will create a new session, so we need to get the original session back
+    const { data: currentSession } = await supabase.auth.getSession()
+    
     const { error: signInError } = await supabase.auth.signInWithPassword({
       email: user.email,
       password: currentPassword,
     })
 
+    // Clear current password from memory immediately
+    setCurrentPassword("")
+
     if (signInError) {
       setIsPasswordLoading(false)
       toast.error(t("settings.currentPasswordIncorrect"))
       return
+    }
+
+    // Restore original session if it exists
+    if (currentSession?.session) {
+      await supabase.auth.setSession(currentSession.session)
     }
 
     const { error } = await supabase.auth.updateUser({
@@ -114,7 +131,6 @@ export function SettingsContent({ user }: SettingsContentProps) {
 
     toast.success(t("common.success"))
     setIsPasswordDialogOpen(false)
-    setCurrentPassword("")
     setNewPassword("")
     setConfirmPassword("")
   }
