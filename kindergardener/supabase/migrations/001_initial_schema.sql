@@ -119,7 +119,8 @@ create policy "Users can view accessible attendance" on attendance
 create policy "Users can check in accessible children" on attendance
   for insert with check (public.has_child_access(child_id));
 create policy "Users can check out accessible children" on attendance
-  for update using (public.has_child_access(child_id));
+  for update using (public.has_child_access(child_id))
+  with check (public.has_child_access(child_id));
 
 -- RLS Policies for contacts
 create policy "Users can view accessible contacts" on contacts
