@@ -122,17 +122,20 @@ export function SettingsContent({ user }: SettingsContentProps) {
       password: newPassword,
     })
 
+    // Clear passwords from memory immediately
+    const passwordUpdateError = error
+    setNewPassword("")
+    setConfirmPassword("")
+    
     setIsPasswordLoading(false)
 
-    if (error) {
-      toast.error(error.message)
+    if (passwordUpdateError) {
+      toast.error(passwordUpdateError.message)
       return
     }
 
     toast.success(t("common.success"))
     setIsPasswordDialogOpen(false)
-    setNewPassword("")
-    setConfirmPassword("")
   }
 
   const handleDeleteAccount = async () => {
