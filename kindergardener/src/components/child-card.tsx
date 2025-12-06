@@ -1,6 +1,8 @@
 "use client"
 
 import { useState } from "react"
+import { useTranslations } from "next-intl"
+import { useOnlineStatus } from "@/hooks/use-online-status"
 import { Card, CardContent } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { StatusBadge } from "@/components/status-badge"
@@ -22,6 +24,8 @@ export function ChildCard({
   attendance,
   onAttendanceUpdate,
 }: ChildCardProps) {
+  const t = useTranslations()
+  const isOnline = useOnlineStatus()
   const [isLoading, setIsLoading] = useState(false)
   const [currentAttendance, setCurrentAttendance] = useState<Attendance | null>(
     attendance
@@ -34,11 +38,36 @@ export function ChildCard({
   }
 
   const handleCheckIn = async () => {
+    if (!isOnline) {
+      toast.error(t("children.offlineWarning"))
+      return
+    }
+
     setIsLoading(true)
     const supabase = createClient()
 
     // Get current user for audit trail
     const { data: { user } } = await supabase.auth.getUser()
+
+    // Check for existing attendance record today to prevent duplicates
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    const tomorrow = new Date(today)
+    tomorrow.setDate(tomorrow.getDate() + 1)
+
+    const { data: existingAttendance } = await supabase
+      .from("attendance")
+      .select("id")
+      .eq("child_id", child.id)
+      .gte("check_in_time", today.toISOString())
+      .lt("check_in_time", tomorrow.toISOString())
+      .maybeSingle()
+
+    if (existingAttendance) {
+      toast.error(t("children.alreadyCheckedIn"))
+      setIsLoading(false)
+      return
+    }
 
     const { data, error } = await supabase
       .from("attendance")
@@ -53,7 +82,7 @@ export function ChildCard({
     setIsLoading(false)
 
     if (error) {
-      toast.error("Failed to check in")
+      toast.error(t("children.checkInFailed"))
       return
     }
 
@@ -63,6 +92,11 @@ export function ChildCard({
 
   const handleCheckOut = async () => {
     if (!currentAttendance) return
+
+    if (!isOnline) {
+      toast.error(t("children.offlineWarning"))
+      return
+    }
 
     setIsLoading(true)
     const supabase = createClient()
@@ -83,7 +117,7 @@ export function ChildCard({
     setIsLoading(false)
 
     if (error) {
-      toast.error("Failed to check out")
+      toast.error(t("children.checkOutFailed"))
       return
     }
 

@@ -4,14 +4,13 @@ import { useState } from "react"
 import { useTranslations } from "next-intl"
 import { useRouter } from "@/i18n/navigation"
 import { createClient } from "@/lib/supabase/client"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -26,7 +25,7 @@ import {
 } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
 import { toast } from "sonner"
-import { Loader2, AlertTriangle } from "lucide-react"
+import { Loader2 } from "lucide-react"
 import type { UserRole } from "@/types/database"
 
 interface SettingsContentProps {
@@ -50,17 +49,24 @@ export function SettingsContent({ user }: SettingsContentProps) {
   const [isPasswordLoading, setIsPasswordLoading] = useState(false)
   const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false)
 
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
-  const [isDeleting, setIsDeleting] = useState(false)
+  const [isSigningOut, setIsSigningOut] = useState(false)
 
   const handleLanguageChange = async (newLanguage: string) => {
     setIsLanguageLoading(true)
     const supabase = createClient()
 
+    // Get current authenticated user's ID for the update
+    const { data: { user: authUser } } = await supabase.auth.getUser()
+    if (!authUser) {
+      toast.error(t("common.error"))
+      setIsLanguageLoading(false)
+      return
+    }
+
     const { error } = await supabase
       .from("profiles")
       .update({ language: newLanguage })
-      .eq("email", user.email)
+      .eq("id", authUser.id)
 
     setIsLanguageLoading(false)
 
@@ -105,16 +111,13 @@ export function SettingsContent({ user }: SettingsContentProps) {
     setConfirmPassword("")
   }
 
-  const handleDeleteAccount = async () => {
-    setIsDeleting(true)
+  const handleSignOut = async () => {
+    setIsSigningOut(true)
     const supabase = createClient()
 
-    // Sign out and redirect - actual deletion would be handled by admin
     await supabase.auth.signOut()
     router.push("/login")
   }
-
-  const canDelete = user.role === "parent"
 
   return (
     <div className="space-y-6 max-w-2xl">
@@ -129,7 +132,7 @@ export function SettingsContent({ user }: SettingsContentProps) {
             <p className="font-medium">{user.email}</p>
           </div>
           <div className="space-y-2">
-            <Label className="text-muted-foreground">Name</Label>
+            <Label className="text-muted-foreground">{t("children.name")}</Label>
             <div className="flex items-center gap-2">
               <p className="font-medium">{user.fullName || "-"}</p>
               <Badge variant="secondary">{user.role}</Badge>
@@ -218,49 +221,24 @@ export function SettingsContent({ user }: SettingsContentProps) {
         </CardContent>
       </Card>
 
-      {/* Danger Zone */}
-      {canDelete && (
-        <Card className="border-destructive">
-          <CardHeader>
-            <CardTitle className="text-destructive">{t("settings.dangerZone")}</CardTitle>
-            <CardDescription>{t("settings.deleteWarning")}</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-              <DialogTrigger asChild>
-                <Button variant="destructive">{t("settings.deleteAccount")}</Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle className="flex items-center gap-2">
-                    <AlertTriangle className="h-5 w-5 text-destructive" />
-                    {t("settings.deleteAccount")}
-                  </DialogTitle>
-                  <DialogDescription>{t("settings.deleteWarning")}</DialogDescription>
-                </DialogHeader>
-                <DialogFooter>
-                  <Button
-                    variant="outline"
-                    onClick={() => setIsDeleteDialogOpen(false)}
-                  >
-                    {t("common.cancel")}
-                  </Button>
-                  <Button
-                    variant="destructive"
-                    onClick={handleDeleteAccount}
-                    disabled={isDeleting}
-                  >
-                    {isDeleting && (
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    )}
-                    {t("common.delete")}
-                  </Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
-          </CardContent>
-        </Card>
-      )}
+      {/* Sign Out */}
+      <Card>
+        <CardHeader>
+          <CardTitle>{t("auth.logout")}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Button
+            variant="outline"
+            onClick={handleSignOut}
+            disabled={isSigningOut}
+          >
+            {isSigningOut && (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            )}
+            {t("auth.logout")}
+          </Button>
+        </CardContent>
+      </Card>
 
       {/* App Version */}
       <div className="text-center text-sm text-muted-foreground">

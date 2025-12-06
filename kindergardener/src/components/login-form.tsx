@@ -4,6 +4,7 @@ import { useState } from "react"
 import { useTranslations } from "next-intl"
 import { useRouter, useSearchParams } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
+import { getSafeRedirectUrl } from "@/lib/security"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -16,7 +17,7 @@ export function LoginForm() {
   const t = useTranslations()
   const router = useRouter()
   const searchParams = useSearchParams()
-  const redirectTo = searchParams.get("redirectTo") || "/"
+  const redirectTo = getSafeRedirectUrl(searchParams.get("redirectTo"))
 
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")

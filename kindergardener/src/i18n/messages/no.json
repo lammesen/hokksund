@@ -54,7 +54,14 @@
     "lastSevenDays": "Siste 7 dager",
     "call": "Ring",
     "sendEmail": "Send e-post",
-    "primary": "Primær"
+    "primary": "Primær",
+    "alreadyCheckedIn": "Barnet er allerede sjekket inn i dag",
+    "checkInFailed": "Kunne ikke sjekke inn",
+    "checkOutFailed": "Kunne ikke sjekke ut",
+    "noContacts": "Ingen kontakter funnet",
+    "noAttendance": "Ingen oppmøteregistreringer",
+    "name": "Navn",
+    "offlineWarning": "Du er frakoblet. Innsjekking/utsjekking er utilgjengelig."
   },
   "settings": {
     "title": "Innstillinger",

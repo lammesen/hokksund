@@ -102,7 +102,7 @@ export function ChildProfileContent({
         </CardHeader>
         <CardContent>
           {contacts.length === 0 ? (
-            <p className="text-muted-foreground">No contacts found</p>
+            <p className="text-muted-foreground">{t("children.noContacts")}</p>
           ) : (
             <div className="space-y-4">
               {contacts.map((contact) => (
@@ -159,7 +159,7 @@ export function ChildProfileContent({
         </CardHeader>
         <CardContent>
           {attendanceHistory.length === 0 ? (
-            <p className="text-muted-foreground">No attendance records</p>
+            <p className="text-muted-foreground">{t("children.noAttendance")}</p>
           ) : (
             <div className="space-y-2">
               {attendanceHistory.map((record) => (

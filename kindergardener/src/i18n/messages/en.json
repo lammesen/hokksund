@@ -54,7 +54,14 @@
     "lastSevenDays": "Last 7 days",
     "call": "Call",
     "sendEmail": "Send Email",
-    "primary": "Primary"
+    "primary": "Primary",
+    "alreadyCheckedIn": "Child is already checked in today",
+    "checkInFailed": "Failed to check in",
+    "checkOutFailed": "Failed to check out",
+    "noContacts": "No contacts found",
+    "noAttendance": "No attendance records",
+    "name": "Name",
+    "offlineWarning": "You are offline. Check-in/out is unavailable."
   },
   "settings": {
     "title": "Settings",
